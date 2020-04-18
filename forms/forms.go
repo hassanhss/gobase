@@ -1,12 +1,15 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func sayHelloName(w http.ResponseWriter, r *http.Request) {
@@ -23,20 +26,33 @@ func sayHelloName(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
 	fmt.Println("method: ", r.Method)
 	if r.Method == "GET" {
+		crutime := time.Now().Unix()
+		h := md5.New()
+
+		io.WriteString(h, strconv.FormatInt(crutime, 10))
+		token := fmt.Sprintf("%x", h.Sum(nil))
+
 		t, _ := template.ParseFiles("forms\\login.gtpl")
-		log.Println(t.Execute(w, nil))
+		t.Execute(w, token)
 	} else {
-		//请求的是登录数据，那么执行登录的逻辑判断
-		fmt.Println("username:", r.Form["username"][0])
-		fmt.Println("password:", r.Form["password"][0])
-		fmt.Println("password:", r.Form.Get("username"))
-		if len(r.Form["username"][0]) == 0 {
-			//为空的处理
+		r.ParseForm()
+		token := r.Form.Get("token")
+		if token != "" {
+			//验证token的合法性
+		} else {
+			//不存在token报错
 		}
-		strconv.Atoi(r.Form.Get("age"))
+		//请求的是登录数据，那么执行登录的逻辑判断
+		fmt.Println("username:", r.Form["username"])
+		fmt.Println("password:", r.Form.Get("username"))
+		fmt.Println("password:", r.Form["password"][0])
+		//if len(r.Form["username"][0]) == 0 {
+		//为空的处理
+		//}
+		//strconv.Atoi(r.Form.Get("age"))
+
 	}
 }
 
