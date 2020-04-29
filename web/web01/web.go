@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"strings"
 )
-
+/*
+go中for循环接收请求，遇到请求开一线程去处理
+ */
 func sayHelloName(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm() //解析参数，默认是不会解析的
 	//fmt.Println(r.Form) //这些信息是输出到服务器端的打印信息
